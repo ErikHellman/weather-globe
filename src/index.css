@@ -1,0 +1,6 @@
+/* Global reset — layout is handled by the GlobeMap component */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
