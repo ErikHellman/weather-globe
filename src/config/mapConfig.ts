@@ -5,6 +5,7 @@ export const MAP_STYLE = 'mapbox://styles/mapbox/satellite-streets-v12';
 export const INITIAL_CENTER: [number, number] = [0, 20];
 export const INITIAL_ZOOM = 1.5;
 export const CLICK_ZOOM_LEVEL = 6;
+export const SEARCH_ZOOM_LEVEL = 12;
 export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 20;
 
