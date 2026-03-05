@@ -8,7 +8,10 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
     css: false,
-    env: { VITE_MAPBOX_TOKEN: 'pk.test_token_for_vitest' },
+    env: {
+      VITE_MAPBOX_TOKEN: 'pk.test_token_for_vitest',
+      VITE_OPENWEATHERMAP_API_KEY: 'test_owm_key_for_vitest',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],

@@ -51,6 +51,26 @@ describe('createClickHandler', () => {
     );
   });
 
+  it('calls onLocationSelect with {lng, lat} when provided', () => {
+    const onSelect = vi.fn();
+    const handler = createClickHandler(mockMap, onSelect);
+    handler(makeEvent(10, 20));
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect(onSelect).toHaveBeenCalledWith({ lng: 10, lat: 20 });
+  });
+
+  it('does not throw when no onLocationSelect is provided', () => {
+    const handler = createClickHandler(mockMap);
+    expect(() => handler(makeEvent(10, 20))).not.toThrow();
+  });
+
+  it('still calls flyTo when onLocationSelect is provided', () => {
+    const onSelect = vi.fn();
+    const handler = createClickHandler(mockMap, onSelect);
+    handler(makeEvent(5, 10));
+    expect(mockFlyTo).toHaveBeenCalledTimes(1);
+  });
+
   it('creates independent handlers for different map instances', () => {
     const mockFlyTo2 = vi.fn();
     const mockMap2 = { flyTo: mockFlyTo2 } as unknown as MapboxMap;

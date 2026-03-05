@@ -27,6 +27,11 @@ describe('GlobeMap', () => {
     expect(() => render(<GlobeMap />)).not.toThrow();
   });
 
+  it('renders without crashing when onLocationSelect prop is provided', () => {
+    const onSelect = vi.fn();
+    expect(() => render(<GlobeMap accessToken="pk.test" onLocationSelect={onSelect} />)).not.toThrow();
+  });
+
   it('renders a Geocoder with the access token', () => {
     render(<GlobeMap accessToken="pk.test" />);
     const props = vi.mocked(Geocoder).mock.calls[0][0];

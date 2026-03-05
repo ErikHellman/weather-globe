@@ -5,7 +5,7 @@ import { buildMapOptions } from '../lib/mapInit';
 import { createClickHandler } from '../lib/mapEvents';
 import { buildSearchFlyToOptions } from '../lib/searchResult';
 import { FOG_CONFIG } from '../config/mapConfig';
-import type { SearchResultFeature } from '../types/map';
+import type { MapClickCoords, SearchResultFeature } from '../types/map';
 
 /**
  * Initializes a MapBox GL map inside the given container ref.
@@ -16,7 +16,8 @@ import type { SearchResultFeature } from '../types/map';
  */
 export function useMapbox(
   containerRef: RefObject<HTMLDivElement | null>,
-  accessToken: string
+  accessToken: string,
+  onLocationSelect?: (coords: MapClickCoords) => void,
 ): { handleSearchResult: (feature: SearchResultFeature) => void } {
   const mapRef = useRef<mapboxgl.Map | null>(null);
 
@@ -31,7 +32,7 @@ export function useMapbox(
       map.setFog(FOG_CONFIG);
     });
 
-    const clickHandler = createClickHandler(map);
+    const clickHandler = createClickHandler(map, onLocationSelect);
     map.on('click', clickHandler);
 
     return () => {
@@ -39,7 +40,7 @@ export function useMapbox(
       map.remove();
       mapRef.current = null;
     };
-  }, [containerRef, accessToken]);
+  }, [containerRef, accessToken, onLocationSelect]);
 
   const handleSearchResult = useCallback((feature: SearchResultFeature) => {
     if (!mapRef.current) return;
