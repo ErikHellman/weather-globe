@@ -18,4 +18,9 @@ describe('GlobeMap', () => {
   it('renders without crashing when no access token is provided', () => {
     expect(() => render(<GlobeMap />)).not.toThrow();
   });
+
+  it('renders without crashing when onLocationSelect prop is provided', () => {
+    const onSelect = vi.fn();
+    expect(() => render(<GlobeMap accessToken="pk.test" onLocationSelect={onSelect} />)).not.toThrow();
+  });
 });

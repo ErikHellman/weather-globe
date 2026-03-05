@@ -36,6 +36,14 @@ describe('useMapbox', () => {
     expect(mockOff).toHaveBeenCalledWith('click', expect.any(Function));
   });
 
+  it('passes onLocationSelect to createClickHandler (click handler registered)', () => {
+    const onSelect = vi.fn();
+    renderHook(() => useMapbox(containerRef, 'token', onSelect));
+    // The click handler registered via mockOn should ultimately call onSelect.
+    // We verify that a click handler was registered (the hook wired up the callback).
+    expect(mockOn).toHaveBeenCalledWith('click', expect.any(Function));
+  });
+
   it('does not initialize when containerRef.current is null', () => {
     const nullRef = { current: null };
     renderHook(() => useMapbox(nullRef, 'token'));

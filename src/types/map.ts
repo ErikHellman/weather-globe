@@ -6,4 +6,5 @@ export interface MapClickCoords {
 export interface GlobeMapProps {
   /** Access token override. Defaults to import.meta.env.VITE_MAPBOX_TOKEN */
   accessToken?: string;
+  onLocationSelect?: (coords: MapClickCoords) => void;
 }

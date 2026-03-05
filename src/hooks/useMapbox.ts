@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { buildMapOptions } from '../lib/mapInit';
 import { createClickHandler } from '../lib/mapEvents';
 import { FOG_CONFIG } from '../config/mapConfig';
+import type { MapClickCoords } from '../types/map';
 
 /**
  * Initializes a MapBox GL map inside the given container ref.
@@ -12,7 +13,8 @@ import { FOG_CONFIG } from '../config/mapConfig';
  */
 export function useMapbox(
   containerRef: RefObject<HTMLDivElement | null>,
-  accessToken: string
+  accessToken: string,
+  onLocationSelect?: (coords: MapClickCoords) => void,
 ): void {
   useEffect(() => {
     const container = containerRef.current;
@@ -24,12 +26,12 @@ export function useMapbox(
       map.setFog(FOG_CONFIG);
     });
 
-    const clickHandler = createClickHandler(map);
+    const clickHandler = createClickHandler(map, onLocationSelect);
     map.on('click', clickHandler);
 
     return () => {
       map.off('click', clickHandler);
       map.remove();
     };
-  }, [containerRef, accessToken]);
+  }, [containerRef, accessToken, onLocationSelect]);
 }

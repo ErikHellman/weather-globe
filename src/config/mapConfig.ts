@@ -8,6 +8,8 @@ export const CLICK_ZOOM_LEVEL = 6;
 export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 20;
 
+export const OWM_BASE_URL = 'https://api.openweathermap.org/data/3.0/onecall';
+
 export const FOG_CONFIG: FogSpecification = {
   color: 'rgb(186, 210, 235)',
   'high-color': 'rgb(36, 92, 223)',
