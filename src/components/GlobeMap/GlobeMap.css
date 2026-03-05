@@ -6,3 +6,11 @@
   height: 100%;
   overflow: hidden;
 }
+
+.globe-search-overlay {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  width: 280px;
+}

@@ -8,3 +8,10 @@ export interface GlobeMapProps {
   accessToken?: string;
   onLocationSelect?: (coords: MapClickCoords) => void;
 }
+
+/** Minimal GeoJSON feature shape used for geocoding search results */
+export interface SearchResultFeature {
+  geometry: {
+    coordinates: number[]; // [lng, lat, ...]
+  };
+}
