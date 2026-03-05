@@ -1,73 +1,88 @@
-# React + TypeScript + Vite
+# Weather Globe
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An interactive 3D Earth globe built with React, Vite, and MapBox GL JS. Click or tap anywhere on the globe to fly to that location.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Node.js 18+
+- A [MapBox access token](https://account.mapbox.com/access-tokens/)
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-## Expanding the ESLint configuration
+2. Create a `.env` file from the example:
+   ```bash
+   cp .env.example .env
+   ```
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+3. Add your MapBox token to `.env`:
+   ```
+   VITE_MAPBOX_TOKEN=pk.your_token_here
+   ```
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+4. Start the dev server:
+   ```bash
+   npm run dev
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Scripts
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Command | Description |
+|---|---|
+| `npm run dev` | Start development server |
+| `npm run build` | Type-check and build for production |
+| `npm run preview` | Preview the production build |
+| `npm test` | Run unit tests |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:coverage` | Run tests with coverage report |
+| `npm run lint` | Run ESLint |
+| `npm run lint:fix` | Run ESLint and auto-fix issues |
+| `npm run format` | Format source files with Prettier |
+| `npm run format:check` | Check formatting without writing |
+
+## Project Structure
+
+```
+src/
+├── config/
+│   └── mapConfig.ts          # Map constants: style, zoom levels, fog settings
+├── lib/
+│   ├── flyToOptions.ts       # Pure function: builds flyTo animation options
+│   ├── mapInit.ts            # Pure function: builds Map initialization options
+│   └── mapEvents.ts          # Factory: creates the click-to-zoom event handler
+├── hooks/
+│   └── useMapbox.ts          # Custom hook: manages the MapBox map lifecycle
+├── components/
+│   └── GlobeMap/
+│       ├── GlobeMap.tsx      # React component: renders the map container
+│       └── GlobeMap.css      # Full-viewport styles
+├── types/
+│   └── map.ts                # Shared TypeScript interfaces
+└── __tests__/                # Unit tests mirroring the src/ structure
+__mocks__/
+└── mapbox-gl.ts              # Manual Vitest mock for MapBox GL JS
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Architecture
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+The app is split into testable layers:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Config** (`mapConfig.ts`) — all tunable values in one place
+- **Pure functions** (`lib/`) — compute options objects with no side effects; tested without mocking
+- **Hook** (`useMapbox.ts`) — the only impure layer; owns map creation, event wiring, and cleanup
+- **Component** (`GlobeMap.tsx`) — thin wrapper that passes a `ref` to the hook and renders the container `div`
+
+MapBox GL JS requires WebGL and Web Workers, so it cannot run in a test environment (JSDOM). The manual mock at `__mocks__/mapbox-gl.ts` replaces it with `vi.fn()` spies so the hook and component logic can be verified without a real browser.
+
+## Tech Stack
+
+- [React 19](https://react.dev)
+- [Vite 7](https://vite.dev)
+- [MapBox GL JS v3](https://docs.mapbox.com/mapbox-gl-js/)
+- [TypeScript 5](https://www.typescriptlang.org)
+- [Vitest](https://vitest.dev) + [Testing Library](https://testing-library.com)
+- [ESLint](https://eslint.org) + [Prettier](https://prettier.io)
