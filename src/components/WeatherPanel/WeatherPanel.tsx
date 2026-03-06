@@ -41,16 +41,12 @@ export function WeatherPanel({ state }: WeatherPanelProps): React.JSX.Element {
             <dd>{state.data.temp.toFixed(1)} °C</dd>
             <dt>Feels like</dt>
             <dd>{state.data.feelsLike.toFixed(1)} °C</dd>
-            <dt>Dew point</dt>
-            <dd>{state.data.dewPoint.toFixed(1)} °C</dd>
             <dt>Humidity</dt>
             <dd>{state.data.humidity} %</dd>
             <dt>Pressure</dt>
             <dd>{state.data.pressure} hPa</dd>
             <dt>Cloud cover</dt>
             <dd>{state.data.clouds} %</dd>
-            <dt>UV index</dt>
-            <dd>{state.data.uvIndex.toFixed(1)}</dd>
             <dt>Visibility</dt>
             <dd>{state.data.visibility.toFixed(1)} km</dd>
             <dt>Wind</dt>

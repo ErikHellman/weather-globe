@@ -16,11 +16,9 @@ const MOCK_WEATHER_DATA: WeatherData = {
   iconUrl: 'https://openweathermap.org/img/wn/02d@2x.png',
   temp: 12.5,
   feelsLike: 10.1,
-  dewPoint: 8.7,
   humidity: 78,
   pressure: 1013,
   clouds: 40,
-  uvIndex: 0.5,
   visibility: 9.5,
   windSpeed: 5.2,
   windDeg: 220,
@@ -104,7 +102,7 @@ describe('useWeather', () => {
 
     const { result, rerender } = renderHook(
       ({ coords }: { coords: MapClickCoords | null }) => useWeather(coords, 'apikey'),
-      { initialProps: { coords: COORDS } },
+      { initialProps: { coords: COORDS as MapClickCoords | null } },
     );
 
     await act(async () => {

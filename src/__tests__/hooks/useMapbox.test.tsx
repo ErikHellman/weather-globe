@@ -64,6 +64,16 @@ describe('useMapbox', () => {
       );
     });
 
+    it('calls onLocationSelect with coordinates from the search feature', () => {
+      const onSelect = vi.fn();
+      const { result } = renderHook(() => useMapbox(containerRef, 'token', onSelect));
+      const feature = { geometry: { coordinates: [13.405, 52.52] } };
+      act(() => {
+        result.current.handleSearchResult(feature);
+      });
+      expect(onSelect).toHaveBeenCalledWith({ lng: 13.405, lat: 52.52 });
+    });
+
     it('does not throw and does not call flyTo when map is not initialized', () => {
       const nullRef = { current: null };
       const { result } = renderHook(() => useMapbox(nullRef, 'token'));

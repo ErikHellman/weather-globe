@@ -1,4 +1,4 @@
-import type { OWMCurrentWeather, OWMOneCallResponse, WeatherData } from '../types/weather';
+import type { OWMCurrentWeatherResponse, WeatherData } from '../types/weather';
 
 const COMPASS_POINTS = [
   'N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE',
@@ -44,7 +44,7 @@ export function buildIconUrl(iconCode: string): string {
 }
 
 /**
- * Builds the OWM One Call API 3.0 request URL.
+ * Builds the OWM Current Weather API 2.5 request URL.
  * Pure function so it can be tested independently of the fetch call.
  */
 export function buildWeatherUrl(
@@ -56,7 +56,6 @@ export function buildWeatherUrl(
   const params = new URLSearchParams({
     lat: String(lat),
     lon: String(lng),
-    exclude: 'minutely,hourly,daily,alerts',
     units: 'metric',
     appid: apiKey,
   });
@@ -64,37 +63,34 @@ export function buildWeatherUrl(
 }
 
 /**
- * Transforms a raw OWM One Call API response into a display-ready WeatherData object.
+ * Transforms a raw OWM Current Weather API response into a display-ready WeatherData object.
  * Pure function: no I/O, no side effects.
  */
 export function transformWeatherResponse(
-  response: OWMOneCallResponse,
+  response: OWMCurrentWeatherResponse,
   lat: number,
   lng: number,
 ): WeatherData {
-  const c: OWMCurrentWeather = response.current;
-  const offset = response.timezone_offset;
-  const condition = c.weather[0];
+  const condition = response.weather[0];
+  const offset = response.timezone;
 
   return {
     locationLabel: `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
     condition: condition?.description ?? 'unknown',
     iconUrl: buildIconUrl(condition?.icon ?? '01d'),
-    temp: c.temp,
-    feelsLike: c.feels_like,
-    dewPoint: c.dew_point,
-    humidity: c.humidity,
-    pressure: c.pressure,
-    clouds: c.clouds,
-    uvIndex: c.uvi,
-    visibility: metersToKm(c.visibility),
-    windSpeed: c.wind_speed,
-    windDeg: c.wind_deg,
-    windCompass: degreesToCompass(c.wind_deg),
-    windGust: c.wind_gust ?? null,
-    rain1h: c.rain?.['1h'] ?? null,
-    snow1h: c.snow?.['1h'] ?? null,
-    sunrise: formatUnixToLocalTime(c.sunrise, offset),
-    sunset: formatUnixToLocalTime(c.sunset, offset),
+    temp: response.main.temp,
+    feelsLike: response.main.feels_like,
+    humidity: response.main.humidity,
+    pressure: response.main.pressure,
+    clouds: response.clouds.all,
+    visibility: metersToKm(response.visibility),
+    windSpeed: response.wind.speed,
+    windDeg: response.wind.deg,
+    windCompass: degreesToCompass(response.wind.deg),
+    windGust: response.wind.gust ?? null,
+    rain1h: response.rain?.['1h'] ?? null,
+    snow1h: response.snow?.['1h'] ?? null,
+    sunrise: formatUnixToLocalTime(response.sys.sunrise, offset),
+    sunset: formatUnixToLocalTime(response.sys.sunset, offset),
   };
 }

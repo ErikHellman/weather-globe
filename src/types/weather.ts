@@ -5,32 +5,41 @@ export interface OWMWeatherCondition {
   icon: string;
 }
 
-export interface OWMCurrentWeather {
-  dt: number;
-  sunrise: number;
-  sunset: number;
-  temp: number;
-  feels_like: number;
-  pressure: number;
-  humidity: number;
-  dew_point: number;
-  uvi: number;
-  clouds: number;
+export interface OWMCurrentWeatherResponse {
+  coord: { lon: number; lat: number };
+  weather: OWMWeatherCondition[];
+  base: string;
+  main: {
+    temp: number;
+    feels_like: number;
+    temp_min: number;
+    temp_max: number;
+    pressure: number;
+    humidity: number;
+    sea_level?: number;
+    grnd_level?: number;
+  };
   visibility: number;
-  wind_speed: number;
-  wind_deg: number;
-  wind_gust?: number;
+  wind: {
+    speed: number;
+    deg: number;
+    gust?: number;
+  };
+  clouds: { all: number };
   rain?: { '1h': number };
   snow?: { '1h': number };
-  weather: OWMWeatherCondition[];
-}
-
-export interface OWMOneCallResponse {
-  lat: number;
-  lon: number;
-  timezone: string;
-  timezone_offset: number;
-  current: OWMCurrentWeather;
+  dt: number;
+  sys: {
+    type?: number;
+    id?: number;
+    country: string;
+    sunrise: number;
+    sunset: number;
+  };
+  timezone: number;
+  id: number;
+  name: string;
+  cod: number;
 }
 
 /** Display-ready weather data for the panel (all metric). */
@@ -40,11 +49,9 @@ export interface WeatherData {
   iconUrl: string;
   temp: number;
   feelsLike: number;
-  dewPoint: number;
   humidity: number;
   pressure: number;
   clouds: number;
-  uvIndex: number;
   visibility: number; // km
   windSpeed: number; // m/s
   windDeg: number;

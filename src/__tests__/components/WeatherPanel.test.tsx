@@ -9,11 +9,9 @@ const MOCK_DATA: WeatherData = {
   iconUrl: 'https://openweathermap.org/img/wn/02d@2x.png',
   temp: 12.5,
   feelsLike: 10.1,
-  dewPoint: 8.7,
   humidity: 78,
   pressure: 1013,
   clouds: 40,
-  uvIndex: 0.5,
   visibility: 9.5,
   windSpeed: 5.2,
   windDeg: 220,
@@ -96,11 +94,6 @@ describe('WeatherPanel — success state', () => {
   it('renders pressure', () => {
     renderPanel({ status: 'success', data: MOCK_DATA });
     expect(screen.getByText('1013 hPa')).toBeInTheDocument();
-  });
-
-  it('renders UV index', () => {
-    renderPanel({ status: 'success', data: MOCK_DATA });
-    expect(screen.getByText('0.5')).toBeInTheDocument();
   });
 
   it('renders visibility in km', () => {

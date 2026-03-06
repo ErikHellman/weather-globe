@@ -2,29 +2,35 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { fetchWeather } from '../../services/weatherApi';
 import { buildWeatherUrl } from '../../lib/weatherTransforms';
 import { OWM_BASE_URL } from '../../config/mapConfig';
-import type { OWMOneCallResponse } from '../../types/weather';
+import type { OWMCurrentWeatherResponse } from '../../types/weather';
 
-const MOCK_RESPONSE: OWMOneCallResponse = {
-  lat: 48.8566,
-  lon: 2.3522,
-  timezone: 'Europe/Paris',
-  timezone_offset: 3600,
-  current: {
-    dt: 1700000000,
-    sunrise: 1699999000,
-    sunset: 1700020000,
+const MOCK_RESPONSE: OWMCurrentWeatherResponse = {
+  coord: { lon: 2.3522, lat: 48.8566 },
+  weather: [{ id: 800, main: 'Clear', description: 'clear sky', icon: '01d' }],
+  base: 'stations',
+  main: {
     temp: 15.0,
     feels_like: 13.5,
+    temp_min: 13.0,
+    temp_max: 17.0,
     pressure: 1015,
     humidity: 65,
-    dew_point: 8.0,
-    uvi: 1.2,
-    clouds: 20,
-    visibility: 10000,
-    wind_speed: 3.5,
-    wind_deg: 180,
-    weather: [{ id: 800, main: 'Clear', description: 'clear sky', icon: '01d' }],
   },
+  visibility: 10000,
+  wind: { speed: 3.5, deg: 180 },
+  clouds: { all: 20 },
+  dt: 1700000000,
+  sys: {
+    type: 2,
+    id: 2041230,
+    country: 'FR',
+    sunrise: 1699999000,
+    sunset: 1700020000,
+  },
+  timezone: 3600,
+  id: 2988507,
+  name: 'Paris',
+  cod: 200,
 };
 
 function makeFetchResponse(body: unknown, ok = true, status = 200, statusText = 'OK') {

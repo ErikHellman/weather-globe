@@ -42,10 +42,15 @@ export function useMapbox(
     };
   }, [containerRef, accessToken, onLocationSelect]);
 
-  const handleSearchResult = useCallback((feature: SearchResultFeature) => {
-    if (!mapRef.current) return;
-    mapRef.current.flyTo(buildSearchFlyToOptions(feature));
-  }, []);
+  const handleSearchResult = useCallback(
+    (feature: SearchResultFeature) => {
+      if (!mapRef.current) return;
+      mapRef.current.flyTo(buildSearchFlyToOptions(feature));
+      const [lng, lat] = feature.geometry.coordinates;
+      onLocationSelect?.({ lng, lat });
+    },
+    [onLocationSelect],
+  );
 
   return { handleSearchResult };
 }

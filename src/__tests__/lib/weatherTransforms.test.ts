@@ -7,7 +7,7 @@ import {
   buildWeatherUrl,
   transformWeatherResponse,
 } from '../../lib/weatherTransforms';
-import type { OWMOneCallResponse } from '../../types/weather';
+import type { OWMCurrentWeatherResponse } from '../../types/weather';
 
 // ---------------------------------------------------------------------------
 // degreesToCompass
@@ -100,7 +100,7 @@ describe('buildIconUrl', () => {
 // buildWeatherUrl
 // ---------------------------------------------------------------------------
 describe('buildWeatherUrl', () => {
-  const BASE = 'https://api.openweathermap.org/data/3.0/onecall';
+  const BASE = 'https://api.openweathermap.org/data/2.5/weather';
 
   it('starts with the given base URL', () => {
     const url = buildWeatherUrl(51.5, -0.1, 'mykey', BASE);
@@ -118,13 +118,9 @@ describe('buildWeatherUrl', () => {
     expect(url).toContain('units=metric');
   });
 
-  it('excludes minutely,hourly,daily,alerts', () => {
+  it('does not include exclude param', () => {
     const url = buildWeatherUrl(0, 0, 'key', BASE);
-    expect(url).toContain('exclude=');
-    expect(url).toContain('minutely');
-    expect(url).toContain('hourly');
-    expect(url).toContain('daily');
-    expect(url).toContain('alerts');
+    expect(url).not.toContain('exclude=');
   });
 
   it('includes the api key', () => {
@@ -142,36 +138,45 @@ describe('buildWeatherUrl', () => {
 // transformWeatherResponse
 // ---------------------------------------------------------------------------
 
-const MOCK_RESPONSE: OWMOneCallResponse = {
-  lat: 51.5074,
-  lon: -0.1278,
-  timezone: 'Europe/London',
-  timezone_offset: 3600,
-  current: {
-    dt: 1700000000,
-    sunrise: 1699999000,
-    sunset: 1700020000,
+const MOCK_RESPONSE: OWMCurrentWeatherResponse = {
+  coord: { lon: -0.1278, lat: 51.5074 },
+  weather: [
+    {
+      id: 801,
+      main: 'Clouds',
+      description: 'few clouds',
+      icon: '02d',
+    },
+  ],
+  base: 'stations',
+  main: {
     temp: 12.5,
     feels_like: 10.1,
+    temp_min: 11.0,
+    temp_max: 14.0,
     pressure: 1013,
     humidity: 78,
-    dew_point: 8.7,
-    uvi: 0.5,
-    clouds: 40,
-    visibility: 9500,
-    wind_speed: 5.2,
-    wind_deg: 220,
-    wind_gust: 8.0,
-    rain: { '1h': 0.5 },
-    weather: [
-      {
-        id: 801,
-        main: 'Clouds',
-        description: 'few clouds',
-        icon: '02d',
-      },
-    ],
   },
+  visibility: 9500,
+  wind: {
+    speed: 5.2,
+    deg: 220,
+    gust: 8.0,
+  },
+  clouds: { all: 40 },
+  rain: { '1h': 0.5 },
+  dt: 1700000000,
+  sys: {
+    type: 2,
+    id: 2075535,
+    country: 'GB',
+    sunrise: 1699999000,
+    sunset: 1700020000,
+  },
+  timezone: 3600,
+  id: 2643743,
+  name: 'London',
+  cod: 200,
 };
 
 describe('transformWeatherResponse', () => {
@@ -191,11 +196,9 @@ describe('transformWeatherResponse', () => {
 
   it('passes through temp', () => expect(result.temp).toBe(12.5));
   it('passes through feelsLike', () => expect(result.feelsLike).toBe(10.1));
-  it('passes through dewPoint', () => expect(result.dewPoint).toBe(8.7));
   it('passes through humidity', () => expect(result.humidity).toBe(78));
   it('passes through pressure', () => expect(result.pressure).toBe(1013));
   it('passes through clouds', () => expect(result.clouds).toBe(40));
-  it('passes through uvIndex', () => expect(result.uvIndex).toBe(0.5));
 
   it('converts visibility from meters to km', () => {
     expect(result.visibility).toBe(metersToKm(9500));
@@ -212,27 +215,27 @@ describe('transformWeatherResponse', () => {
   it('includes rain1h when present', () => expect(result.rain1h).toBe(0.5));
 
   it('formats sunrise using timezone offset', () => {
-    const expected = formatUnixToLocalTime(MOCK_RESPONSE.current.sunrise, 3600);
+    const expected = formatUnixToLocalTime(MOCK_RESPONSE.sys.sunrise, 3600);
     expect(result.sunrise).toBe(expected);
   });
 
   it('formats sunset using timezone offset', () => {
-    const expected = formatUnixToLocalTime(MOCK_RESPONSE.current.sunset, 3600);
+    const expected = formatUnixToLocalTime(MOCK_RESPONSE.sys.sunset, 3600);
     expect(result.sunset).toBe(expected);
   });
 
   it('sets windGust to null when absent', () => {
-    const noGust: OWMOneCallResponse = {
+    const noGust: OWMCurrentWeatherResponse = {
       ...MOCK_RESPONSE,
-      current: { ...MOCK_RESPONSE.current, wind_gust: undefined },
+      wind: { speed: 5.2, deg: 220 },
     };
     expect(transformWeatherResponse(noGust, 0, 0).windGust).toBeNull();
   });
 
   it('sets rain1h to null when absent', () => {
-    const noRain: OWMOneCallResponse = {
+    const noRain: OWMCurrentWeatherResponse = {
       ...MOCK_RESPONSE,
-      current: { ...MOCK_RESPONSE.current, rain: undefined },
+      rain: undefined,
     };
     expect(transformWeatherResponse(noRain, 0, 0).rain1h).toBeNull();
   });
@@ -242,17 +245,17 @@ describe('transformWeatherResponse', () => {
   });
 
   it('includes snow1h when present', () => {
-    const withSnow: OWMOneCallResponse = {
+    const withSnow: OWMCurrentWeatherResponse = {
       ...MOCK_RESPONSE,
-      current: { ...MOCK_RESPONSE.current, snow: { '1h': 1.2 } },
+      snow: { '1h': 1.2 },
     };
     expect(transformWeatherResponse(withSnow, 0, 0).snow1h).toBe(1.2);
   });
 
   it('uses fallback icon when weather array is empty', () => {
-    const noWeather: OWMOneCallResponse = {
+    const noWeather: OWMCurrentWeatherResponse = {
       ...MOCK_RESPONSE,
-      current: { ...MOCK_RESPONSE.current, weather: [] },
+      weather: [],
     };
     const r = transformWeatherResponse(noWeather, 0, 0);
     expect(r.iconUrl).toBe('https://openweathermap.org/img/wn/01d@2x.png');
